@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GyanNova - Popup Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; }
+        
+        .bg-sage-green { background-color: #9CAF88; }
+        .bg-terracotta { background-color: #D4A574; }
+        .text-sage-green { color: #9CAF88; }
+        .text-terracotta { color: #D4A574; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .modal-overlay {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            animation: modalSlideIn 0.5s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .close-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+        }
+        
+        .option-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .option-card.selected {
+            border-color: #9CAF88;
+            background-color: rgba(156, 175, 136, 0.1);
+        }
+        
+        .notification {
+            animation: slideInRight 0.5s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Background Shapes -->
+    <div class="floating-shape w-20 h-20 bg-sage-green top-20 left-20"></div>
+    <div class="floating-shape w-16 h-16 bg-terracotta top-40 right-32"></div>
+    <div class="floating-shape w-12 h-12 bg-blue-400 bottom-20 left-40"></div>
+    <div class="floating-shape w-24 h-24 bg-purple-400 bottom-40 right-20"></div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <h1 class="text-3xl font-bold text-gray-900">GyanNova</h1>
+                    <span class="ml-3 text-sm text-gray-500">Popup Demo</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showPopup()" 
+                            class="px-4 py-2 bg-sage-green text-white rounded-lg hover:bg-opacity-90 transition-all">
+                        Show Popup
+                    </button>
+                    <button onclick="window.location.href='dashboard.html'" 
+                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all">
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Welcome Section -->
+        <div class="text-center mb-12 fade-in-up">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Popup Demo Page</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                This page automatically shows a popup when loaded or reloaded. The popup appears with smooth animations and provides interactive options.
+            </p>
+        </div>
+
+        <!-- Demo Content -->
+        <div class="grid md:grid-cols-2 gap-8 mb-12">
+            <div class="bg-white rounded-2xl shadow-lg p-8 fade-in-up">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-sage-green rounded-xl flex items-center justify-center mr-4">
+                        <span class="text-2xl">🎯</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800">Auto Popup Feature</h3>
+                        <p class="text-gray-600">Popup appears on every page load</p>
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-4">
+                    This page demonstrates how to create a popup that automatically appears when the page is loaded or reloaded. 
+                    The popup includes smooth animations and interactive elements.
+                </p>
+                <button onclick="showPopup()" 
+                        class="px-6 py-3 bg-sage-green text-white rounded-lg hover:bg-opacity-90 transition-all">
+                    Show Popup Manually
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-8 fade-in-up">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-terracotta rounded-xl flex items-center justify-center mr-4">
+                        <span class="text-2xl">⚡</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800">Interactive Options</h3>
+                        <p class="text-gray-600">Multiple popup types and interactions</p>
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-4">
+                    The popup system supports different types of interactions including profile selection, 
+                    notifications, and custom content with smooth animations.
+                </p>
+                <button onclick="showNotification()" 
+                        class="px-6 py-3 bg-terracotta text-white rounded-lg hover:bg-opacity-90 transition-all">
+                    Show Notification
+                </button>
+            </div>
+        </div>
+
+        <!-- Popup Statistics -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 fade-in-up">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Popup Statistics</h3>
+            <div class="grid md:grid-cols-4 gap-6">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-sage-green mb-2" id="popupCount">0</div>
+                    <div class="text-sm text-gray-600">Popups Shown</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-terracotta mb-2" id="interactionCount">0</div>
+                    <div class="text-sm text-gray-600">Interactions</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-blue-500 mb-2" id="timeOnPage">0s</div>
+                    <div class="text-sm text-gray-600">Time on Page</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-purple-500 mb-2" id="reloadCount">1</div>
+                    <div class="text-sm text-gray-600">Page Reloads</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup Modal -->
+    <div id="popupModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800">Welcome to GyanNova!</h3>
+                    <button onclick="closePopup()" 
+                            class="close-btn w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all">
+                        <span class="text-gray-600 text-xl">×</span>
+                    </button>
+                </div>
+                
+                <!-- Modal Body -->
+                <div class="p-6">
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 bg-gradient-to-br from-sage-green to-terracotta rounded-full flex items-center justify-center mx-auto mb-4 pulse-animation">
+                            <span class="text-3xl">🎯</span>
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-2">Choose Your Learning Profile</h4>
+                        <p class="text-gray-600">Select your learning style to get started</p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div class="option-card border-2 border-gray-200 rounded-xl p-6" 
+                             onclick="selectProfile('ram')" data-profile="ram">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-sage-green rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <span class="text-2xl font-bold text-white">R</span>
+                                </div>
+                                <h5 class="font-semibold text-gray-800 mb-2">Ram Kumar</h5>
+                                <p class="text-sm text-gray-600 mb-3">Foundation Builder</p>
+                                <div class="space-y-1 text-xs text-gray-600">
+                                    <div>✓ Step-by-step learning</div>
+                                    <div>✓ Conceptual understanding</div>
+                                    <div>✓ Practice focused</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-card border-2 border-gray-200 rounded-xl p-6" 
+                             onclick="selectProfile('rahul')" data-profile="rahul">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-terracotta rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <span class="text-2xl font-bold text-white">R</span>
+                                </div>
+                                <h5 class="font-semibold text-gray-800 mb-2">Rahul Sharma</h5>
+                                <p class="text-sm text-gray-600 mb-3">Excellence Achiever</p>
+                                <div class="space-y-1 text-xs text-gray-600">
+                                    <div>✓ Advanced challenges</div>
+                                    <div>✓ Fast-paced learning</div>
+                                    <div>✓ Competition ready</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button onclick="continueToDashboard()" 
+                                class="px-8 py-3 bg-sage-green text-white rounded-xl font-semibold hover:bg-opacity-90 transition-all transform hover:scale-105">
+                            Continue to Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notificationToast" class="fixed top-4 right-4 z-50 hidden">
+        <div class="notification bg-white rounded-lg shadow-lg border border-gray-200 p-4 max-w-sm">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    <span class="text-green-600 text-xl">✓</span>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-800">Success!</h4>
+                    <p class="text-sm text-gray-600" id="notificationText">Popup opened successfully</p>
+                </div>
+                <button onclick="hideNotification()" 
+                        class="ml-4 text-gray-400 hover:text-gray-600">
+                    ×
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let popupCount = 0;
+        let interactionCount = 0;
+        let startTime = Date.now();
+        let selectedProfile = null;
+        let reloadCount = parseInt(localStorage.getItem('reloadCount') || '1');
+
+        // Show popup function
+        function showPopup() {
+            console.log('showPopup() called');
+            const modal = document.getElementById('popupModal');
+            if (!modal) {
+                console.error('Popup modal not found!');
+                return;
+            }
+            console.log('Modal found, removing hidden class');
+            modal.classList.remove('hidden');
+            
+            // Animate popup appearance
+            anime({
+                targets: '.modal-content',
+                scale: [0.8, 1],
+                opacity: [0, 1],
+                duration: 500,
+                easing: 'easeOutCubic'
+            });
+            
+            // Update statistics
+            popupCount++;
+            document.getElementById('popupCount').textContent = popupCount;
+            
+            // Show notification
+            showNotification('Popup opened successfully!');
+            console.log('Popup should be visible now');
+        }
+
+        // Close popup function
+        function closePopup() {
+            const modal = document.getElementById('popupModal');
+            
+            anime({
+                targets: '.modal-content',
+                scale: [1, 0.8],
+                opacity: [1, 0],
+                duration: 300,
+                easing: 'easeInCubic',
+                complete: function() {
+                    modal.classList.add('hidden');
+                }
+            });
+        }
+
+        // Select profile function
+        function selectProfile(profile) {
+            selectedProfile = profile;
+            
+            // Update UI
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected', 'border-sage-green', 'border-terracotta');
+                card.classList.add('border-gray-200');
+            });
+            
+            const selectedCard = document.querySelector(`[data-profile="${profile}"]`);
+            selectedCard.classList.add('selected', profile === 'ram' ? 'border-sage-green' : 'border-terracotta');
+            selectedCard.classList.remove('border-gray-200');
+            
+            // Animate selection
+            anime({
+                targets: selectedCard,
+                scale: [1, 1.05, 1],
+                duration: 300,
+                easing: 'easeInOutQuad'
+            });
+            
+            interactionCount++;
+            document.getElementById('interactionCount').textContent = interactionCount;
+            
+            // Save to localStorage
+            localStorage.setItem('selectedProfile', profile);
+            
+            showNotification(`${profile === 'ram' ? 'Ram Kumar' : 'Rahul Sharma'} profile selected!`);
+        }
+
+        // Continue to dashboard
+        function continueToDashboard() {
+            if (!selectedProfile) {
+                alert('Please select a profile first!');
+                return;
+            }
+            
+            closePopup();
+            showNotification('Redirecting to dashboard...');
+            
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const toast = document.getElementById('notificationToast');
+            const text = document.getElementById('notificationText');
+            
+            text.textContent = message;
+            toast.classList.remove('hidden');
+            
+            anime({
+                targets: toast,
+                translateX: [300, 0],
+                opacity: [0, 1],
+                duration: 500,
+                easing: 'easeOutCubic'
+            });
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                hideNotification();
+            }, 3000);
+        }
+
+        // Hide notification
+        function hideNotification() {
+            const toast = document.getElementById('notificationToast');
+            
+            anime({
+                targets: toast,
+                translateX: [0, 300],
+                opacity: [1, 0],
+                duration: 300,
+                easing: 'easeInCubic',
+                complete: function() {
+                    toast.classList.add('hidden');
+                }
+            });
+        }
+
+        // Update time on page
+        function updateTime() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timeOnPage').textContent = `${elapsed}s`;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded fired - initializing popup');
+            
+            // Force clear any existing popup state
+            localStorage.removeItem('popupShown');
+            
+            // Update reload count
+            localStorage.setItem('reloadCount', reloadCount.toString());
+            document.getElementById('reloadCount').textContent = reloadCount;
+            
+            // Start timer
+            setInterval(updateTime, 1000);
+            
+            // Animate elements
+            anime({
+                targets: '.fade-in-up',
+                translateY: [30, 0],
+                opacity: [0, 1],
+                delay: anime.stagger(100),
+                duration: 800,
+                easing: 'easeOutCubic'
+            });
+            
+            // Animate floating shapes
+            anime({
+                targets: '.floating-shape',
+                translateY: function() { return anime.random(-20, 20); },
+                translateX: function() { return anime.random(-20, 20); },
+                rotate: function() { return anime.random(0, 360); },
+                duration: function() { return anime.random(4000, 6000); },
+                direction: 'alternate',
+                easing: 'easeInOutSine',
+                loop: true
+            });
+            
+            // Show popup immediately with no delay and force it
+            console.log('About to show popup');
+            setTimeout(() => {
+                console.log('Showing popup now');
+                showPopup();
+            }, 500);
+        });
+        
+        // Also try window.onload as backup
+        window.addEventListener('load', function() {
+            console.log('Window load event fired');
+            setTimeout(() => {
+                console.log('Showing popup from window.load');
+                showPopup();
+            }, 1000);
+        });
+
+        // Handle escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePopup();
+                hideNotification();
+            }
+        });
+
+        // Handle click outside modal
+        document.getElementById('popupModal').addEventListener('click', function(e) {
+            if (e.target === this || e.target.classList.contains('modal-overlay')) {
+                closePopup();
+            }
+        });
+
+        // Prevent popup from closing when clicking inside modal content
+        document.querySelector('.modal-content').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    </script>
+</body>
+</html>

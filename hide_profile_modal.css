@@ -1,0 +1,7 @@
+#onboardingStep1 {
+    display: none !important;
+}
+
+#onboardingStep2 {
+    display: block !important;
+}

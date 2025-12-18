@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GyanNova - Learning Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .bg-sage-green { background-color: #9CAF88; }
+        .bg-terracotta { background-color: #D4A574; }
+        .text-sage-green { color: #9CAF88; }
+        .text-terracotta { color: #D4A574; }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .option-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-radius: 0.75rem; /* rounded-xl */
+            border-width: 2px;
+            border-color: #e5e7eb; /* border-gray-200 */
+        }
+        
+        .option-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        /* The key selector for selected items */
+        .option-card.selected {
+            border-color: #9CAF88 !important; /* text-sage-green */
+            background-color: rgba(156, 175, 136, 0.1); /* Light Sage Green background */
+            box-shadow: 0 4px 10px rgba(156, 175, 136, 0.3);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease-out;
+        }
+        
+        .question-option {
+            transition: all 0.2s ease;
+            border-width: 1px;
+        }
+        
+        .question-option:hover {
+            background-color: #f9fafb;
+        }
+
+        .question-option.selected {
+            border-color: #9CAF88;
+            background-color: rgba(156, 175, 136, 0.1);
+        }
+        
+        .correct-answer {
+            background-color: #dcfce7; /* bg-green-100 */
+            border-color: #16a34a; /* border-green-600 */
+        }
+        
+        .incorrect-answer {
+            background-color: #fef2f2; /* bg-red-100 */
+            border-color: #dc2626; /* border-red-600 */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <h1 class="text-3xl font-bold text-gray-900">GyanNova Learning</h1>
+                    <span class="ml-3 text-sm text-gray-500">Adaptive Learning Platform</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="studentInfo" class="text-right">
+                        <div id="studentName" class="font-semibold text-gray-800"></div>
+                        <div id="studentClass" class="text-sm text-gray-600"></div>
+                    </div>
+                    <button onclick="window.location.href='dashboard.html'" 
+                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all">
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="selectionSection" class="bg-white rounded-2xl shadow-lg p-8 mb-8 fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Select Your Learning Path</h2>
+            
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Choose Your Class</h3>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="classSelection">
+                    </div>
+            </div>
+            
+            <div class="mb-8" id="topicSection" style="display: none;">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Choose Topic</h3>
+                <div class="space-y-6" id="topicSelection">
+                    </div>
+            </div>
+
+            <div class="text-center" id="startButtonSection" style="display: none;">
+                <button onclick="startQuiz()" 
+                        id="startLearningButton"
+                        class="px-8 py-4 bg-sage-green text-white rounded-xl font-semibold text-lg hover:bg-opacity-90 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Start Learning 🚀
+                </button>
+            </div>
+        </div>
+
+        <div id="quizSection" class="bg-white rounded-2xl shadow-lg p-8" style="display: none;">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Quiz Time!</h2>
+                    <p class="text-gray-600">Question <span id="currentQuestion">1</span> of <span id="totalQuestions">0</span></p>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-sage-green" id="scoreDisplay">0</div>
+                    <div class="text-sm text-gray-600">Score</div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <div class="bg-gray-200 rounded-full h-2">
+                    <div id="quizProgress" class="bg-sage-green h-2 rounded-full progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div id="questionDisplay" class="mb-8">
+                <div class="text-center text-gray-500">Loading questions...</div>
+            </div>
+
+            <div class="flex justify-between">
+                <button onclick="previousQuestion()" 
+                        id="prevButton" 
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        style="display: none;">
+                    Previous
+                </button>
+                <button onclick="nextQuestion()" 
+                        id="nextButton" 
+                        class="px-6 py-3 bg-sage-green text-white rounded-lg hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    Next
+                </button>
+                <button onclick="submitQuiz()" 
+                        id="submitButton" 
+                        class="px-6 py-3 bg-terracotta text-white rounded-lg hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        style="display: none;">
+                    Submit Quiz
+                </button>
+            </div>
+        </div>
+
+        <div id="resultsSection" class="bg-white rounded-2xl shadow-lg p-8" style="display: none;">
+            <div class="text-center">
+                <div class="w-24 h-24 bg-sage-green rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-4xl">🎉</span>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
+                <div class="text-5xl font-bold text-sage-green mb-2" id="finalScore">0%</div>
+                <p class="text-gray-600 mb-6">Great job on completing the quiz!</p>
+                <div class="flex justify-center space-x-4">
+                    <button onclick="restartQuiz()" 
+                            class="px-6 py-3 bg-sage-green text-white rounded-lg hover:bg-opacity-90 transition-all">
+                        Try Again
+                    </button>
+                    <button onclick="backToSelection()" 
+                            class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all">
+                        Back to Selection
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let selectedClass = null;
+        let selectedSubject = null; // Still needed internally for data fetching
+        let selectedTopic = null;
+        let currentQuestionIndex = 0;
+        let questions = [];
+        let score = 0;
+        let studentData = {};
+
+        // Class and subject data (kept for topic dropdown population)
+        const classData = {
+            6: { /* ... Your existing Class 6 data ... */
+                subjects: ['Mathematics', 'Science', 'English', 'Social Studies', 'Hindi'],
+                topics: {
+                    'Mathematics': ['Knowing Our Numbers', 'Whole Numbers', 'Integers', 'Fractions', 'Decimals', 'Data Handling', 'Mensuration', 'Algebra', 'Ratio and Proportion', 'Symmetry', 'Practical Geometry'],
+                    'Science': ['Food: Where Does It Come From?', 'Components of Food', 'Fibre to Fabric', 'Sorting Materials into Groups', 'Separation of Substances', 'Changes Around Us', 'Getting to Know Plants', 'Body Movements', 'The Living Organisms and Their Surroundings', 'Motion and Measurement of Distances', 'Light, Shadows and Reflections', 'Electricity and Circuits', 'Fun with Magnets', 'Water'],
+                    'English': ['Who Did Patrick\'s Homework?', 'How the Dog Found Himself', 'Taro\'s Reward', 'An Indian-American Woman in Space', 'A Different Kind of School', 'Who I Am', 'Fair Play', 'A Game of Chance', 'Desert Animals', 'The Banyan Tree'],
+                    'Social Studies': ['What, Where, How and When?', 'On the Trial of the Earliest People', 'From Gathering to Growing Food', 'In the Earliest Cities', 'What Books and Burials Tell Us', 'Kingdoms, Kings and an Early Republic', 'New Questions and Ideas', 'Ashoka, The Emperor Who Gave Up War', 'Vital Villages, Thriving Towns', 'Traders, Kings and Pilgrims', 'New Empires and Kingdoms', 'Buildings, Paintings and Books'],
+                    'Hindi': ['वह चिड़िया जो', 'बचपन', 'नादान दोस्त', 'चाँद से थोड़ी-सी गप्पें', 'अक्षरों का महत्व', 'पार नज़र के', 'साथी हाथ बढ़ाना', 'ऐसे-ऐसे', 'टिकट-अलबम', 'झांसी की रानी']
+                }
+            },
+            7: { /* ... Your existing Class 7 data ... */
+                subjects: ['Mathematics', 'Science', 'English', 'Social Studies', 'Hindi'],
+                topics: {
+                    'Mathematics': ['Integers', 'Fractions and Decimals', 'Data Handling', 'Simple Equations', 'Lines and Angles', 'The Triangle and its Properties', 'Congruence of Triangles', 'Comparing Quantities', 'Rational Numbers', 'Practical Geometry', 'Perimeter and Area', 'Algebraic Expressions', 'Exponents and Powers', 'Symmetry', 'Visualising Solid Shapes'],
+                    'Science': ['Nutrition in Plants', 'Nutrition in Animals', 'Fibre to Fabric', 'Heat', 'Acids, Bases and Salts', 'Physical and Chemical Changes', 'Weather, Climate and Adaptations of Animals to Climate', 'Winds, Storms and Cyclones', 'Soil', 'Respiration in Organisms', 'Transportation in Animals and Plants', 'Reproduction in Plants', 'Motion and Force', 'Electric Current and its Effects', 'Light'],
+                    'English': ['Three Questions', 'A Gift of Chappals', 'Gopal and the Hilsa Fish', 'The Ashes That Made Trees Bloom', 'Quality', 'Expert Detectives', 'The Invention of Vita-Wonk', 'Fire: Friend and Foe', 'A Bicycle in Good Repair', 'The Story of Cricket'],
+                    'Social Studies': ['Tracing Changes Through a Thousand Years', 'New Kings and Kingdoms', 'The Delhi Sultans', 'The Mughal Empire', 'Rulers and Buildings', 'Towns, Traders and Craftspersons', 'Tribes, Nomads and Settled Communities', 'Devotional Paths to the Divine', 'The Making of Regional Cultures', 'Eighteenth-Century Political Formations'],
+                    'Hindi': ['हम पंछी उन्मुक्त गगन के', 'दादी माँ', 'हिमालय की बेटियां', 'कठपुतली', 'मिठाईवाला', 'रक्त और हमारा शरीर', 'पापा खो गए', 'शाम एक किशान', 'शुभकामनाएँ', 'विप्रवाणी']
+                }
+            },
+            8: { /* ... Your existing Class 8 data ... */
+                subjects: ['Mathematics', 'Science', 'English', 'Social Studies', 'Hindi'],
+                topics: {
+                    'Mathematics': ['Rational Numbers', 'Linear Equations in One Variable', 'Understanding Quadrilaterals', 'Practical Geometry', 'Data Handling', 'Squares and Square Roots', 'Cubes and Cube Roots', 'Comparing Quantities', 'Algebraic Expressions and Identities', 'Visualising Solid Shapes', 'Mensuration', 'Exponents and Powers', 'Direct and Inverse Proportions', 'Factorisation', 'Introduction to Graphs', 'Playing with Numbers'],
+                    'Science': ['Crop Production and Management', 'Microorganisms: Friend and Foe', 'Synthetic Fibres and Plastics', 'Materials: Metals and Non-metals', 'Coal and Petroleum', 'Combustion and Flame', 'Conservation of Plants and Animals', 'Cell — Structure and Functions', 'Reproduction in Animals', 'Reaching the Age of Adolescence', 'Force and Pressure', 'Friction', 'Sound', 'Chemical Effects of Electric Current', 'Some Natural Phenomena', 'Light', 'Stars and The Solar System', 'Pollution of Air and Water'],
+                    'English': ['The Best Christmas Present in the World', 'The Tsunami', 'Glimpses of the Past', 'Bepin Choudhury\'s Lapse of Memory', 'The Summit Within', 'This is Jody\'s Fawn', 'A Visit to Cambridge', 'A Short Monsoon Diary', 'The Great Stone Face — I', 'The Great Stone Face — II'],
+                    'Social Studies': ['How, When and Where', 'From Trade to Territory', 'Ruling the Countryside', 'Tribals, Dikus and the Vision of a Golden Age', 'When People Rebel', 'Colonialism and the City', 'Weavers, Iron Smelters and Factory Owners', 'Civilising the "Native", Educating the Nation', 'Women, Caste and Reform', 'The Changing World of Visual Arts', 'The Making of the National Movement: 1870s-1947', 'India After Independence'],
+                    'Hindi': ['ध्वनि', 'लाख की चूड़ियां', 'बस की यात्रा', 'दीवानों की हस्ती', 'चिठ्ठियों की अनूठी दुनिया', 'भगवान के डाकिए', 'क्या निराश हुआ जाए', 'यह सबसे कठिन समय नहीं', 'कबीर की साखियां', 'कामचोर', 'जहाँ धूप भी अपनी है', 'अदमी का भेष']
+                }
+            },
+            9: { /* ... Your existing Class 9 data ... */
+                subjects: ['Mathematics', 'Science', 'English', 'Social Studies', 'Hindi'],
+                topics: {
+                    'Mathematics': ['Number Systems', 'Polynomials', 'Coordinate Geometry', 'Linear Equations in Two Variables', 'Introduction to Euclid\'s Geometry', 'Lines and Angles', 'Triangles', 'Quadrilaterals', 'Areas of Parallelograms and Triangles', 'Circles', 'Constructions', 'Heron\'s Formula', 'Surface Areas and Volumes', 'Statistics', 'Probability'],
+                    'Science': ['Matter in Our Surroundings', 'Is Matter Around Us Pure', 'Atoms and Molecules', 'Structure of the Atom', 'The Fundamental Unit of Life', 'Tissues', 'Diversity in Living Organisms', 'Motion', 'Force and Laws of Motion', 'Gravitation', 'Work and Energy', 'Sound', 'Why Do We Fall Ill', 'Natural Resources', 'Improvement in Food Resources'],
+                    'English': ['The Fun They Had', 'The Sound of Music', 'The Little Girl', 'A Truly Beautiful Mind', 'The Snake and the Mirror', 'My Childhood', 'Packing', 'Reach for the Top', 'The Bond of Love', 'Kathmandu', 'If I Were You'],
+                    'Social Studies': ['The French Revolution', 'Socialism in Europe and the Russian Revolution', 'Nazism and the Rise of Hitler', 'Forest Society and Colonialism', 'Pastoralists in the Modern World', 'Peasants and Farmers', 'History and Sport: The Story of Cricket', 'Clothing: A Social History'],
+                    'Hindi': ['दो बैलों की कथा', 'ल्हासा की ओर', 'उपभोक्तावाद की संस्कृति', 'साँवले सपनों की याद', 'नाना साहब की पुत्री देवी मैना को भस्म कर दिया गया', 'प्रेमचंद के फटे जूते', 'मेरे बचपन के दिन', 'एक कुत्ता और एक मैना', 'साखियाँ एवं सबद', 'वाख', 'सवैये', 'कैदी और कोकिल', 'ग्राम श्री', 'चंद्र गहना से लौटती बेर', 'मेघ आए', 'यमराज की दिशा', 'बचे काम पर जग बीती']
+                }
+            },
+            10: { /* ... Your existing Class 10 data ... */
+                subjects: ['Mathematics', 'Science', 'English', 'Social Studies', 'Hindi'],
+                topics: {
+                    'Mathematics': ['Real Numbers', 'Polynomials', 'Pair of Linear Equations in Two Variables', 'Quadratic Equations', 'Arithmetic Progressions', 'Triangles', 'Coordinate Geometry', 'Introduction to Trigonometry', 'Some Applications of Trigonometry', 'Circles', 'Constructions', 'Areas Related to Circles', 'Surface Areas and Volumes', 'Statistics', 'Probability'],
+                    'Science': ['Chemical Reactions and Equations', 'Acids, Bases and Salts', 'Metals and Non-metals', 'Carbon and its Compounds', 'Periodic Classification of Elements', 'Life Processes', 'Control and Coordination', 'How do Organisms Reproduce?', 'Heredity and Evolution', 'Light – Reflection and Refraction', 'The Human Eye and the Colourful World', 'Electricity', 'Magnetic Effects of Electric Current', 'Sources of Energy', 'Our Environment', 'Management of Natural Resources'],
+                    'English': ['A Letter to God', 'Nelson Mandela: Long Walk to Freedom', 'Two Stories about Flying', 'From the Diary of Anne Frank', 'The Hundred Dresses–I', 'The Hundred Dresses–II', 'Glimpses of India', 'Mijbil the Otter', 'Madam Rides the Bus', 'The Sermon at Benares', 'The Proposal'],
+                    'Social Studies': ['The Rise of Nationalism in Europe', 'The Nationalist Movement in Indo-China', 'Nationalism in India', 'The Making of a Global World', 'The Age of Industrialisation', 'Work, Life and Leisure', 'Print Culture and the Modern World', 'Novels, Society and History'],
+                    'Hindi': ['सूरदास के पद', 'तुलसीदास', 'देव', 'जयशंकर प्रसाद', 'सूर्यकांत त्रिपाठी 'निराला'', 'नागार्जुन', 'गिरिजाकुमार माथुर', 'ऋतुराज', 'मंगलेश डबराल', 'स्वयं प्रकाश', 'सूरज का अंतिम घोड़ा', 'आलोक धर', 'कैंसर से लड़ने वाले बच्चे']
+                }
+            }
+        };
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStudentData();
+            populateClasses();
+            
+            // Animate elements
+            anime({
+                targets: '.fade-in',
+                translateY: [30, 0],
+                opacity: [0, 1],
+                duration: 800,
+                easing: 'easeOutCubic'
+            });
+        });
+
+        function loadStudentData() {
+            const studentDataStr = localStorage.getItem('currentStudent');
+            if (studentDataStr) {
+                studentData = JSON.parse(studentDataStr);
+                document.getElementById('studentName').textContent = studentData.name || 'Student';
+                document.getElementById('studentClass').textContent = studentData.class ? `Class ${studentData.class}` : '';
+            }
+        }
+
+        // Populate classes
+        function populateClasses() {
+            const classSelection = document.getElementById('classSelection');
+            classSelection.innerHTML = ''; // Clear previous content
+            const classes = [6, 7, 8, 9, 10];
+            
+            classes.forEach(classNum => {
+                const classCard = document.createElement('div');
+                classCard.className = 'option-card border-2 border-gray-200 rounded-xl p-4 text-center';
+                classCard.setAttribute('data-class', classNum);
+                classCard.innerHTML = `
+                    <div class="text-2xl font-bold text-gray-800">${classNum}</div>
+                    <div class="text-sm text-gray-600">Class</div>
+                `;
+                classCard.onclick = (event) => selectClass(classNum, event.currentTarget);
+                classSelection.appendChild(classCard);
+            });
+        }
+
+        // Select class - now jumps directly to topics
+        function selectClass(classNum, cardElement) {
+            selectedClass = classNum;
+            selectedSubject = null; // Reset subject/topic on class change
+            selectedTopic = null;
+            
+            // Update UI: Remove 'selected' from all class cards
+            document.querySelectorAll('#classSelection .option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            // Add 'selected' to the clicked card
+            cardElement.classList.add('selected');
+            
+            // Hide lower sections and disable start button
+            document.getElementById('topicSection').style.display = 'none';
+            document.getElementById('startButtonSection').style.display = 'none';
+            document.getElementById('startLearningButton').disabled = true;
+
+            // Save to student data
+            studentData.class = classNum;
+            localStorage.setItem('currentStudent', JSON.stringify(studentData));
+            document.getElementById('studentClass').textContent = `Class ${classNum}`;
+            
+            // Show Topic section with combined subjects
+            document.getElementById('topicSection').style.display = 'block';
+            populateCombinedTopics(classNum);
+            
+            // Animate
+            anime({ targets: '#topicSection', translateY: [20, 0], opacity: [0, 1], duration: 500, easing: 'easeOutCubic' });
+        }
+
+        /**
+         * New function to populate topics grouped by their subject.
+         * @param {number} classNum 
+         */
+        function populateCombinedTopics(classNum) {
+            const topicSelection = document.getElementById('topicSelection');
+            topicSelection.innerHTML = ''; // Clear previous topics
+            
+            const classSubjects = classData[classNum].subjects;
+            const classTopics = classData[classNum].topics;
+
+            classSubjects.forEach(subject => {
+                const topics = classTopics[subject] || [];
+                
+                if (topics.length > 0) {
+                    // 1. Subject Header
+                    const subjectHeader = document.createElement('h4');
+                    subjectHeader.className = 'text-lg font-bold text-sage-green mt-4 mb-2 border-b border-sage-green pb-1';
+                    subjectHeader.textContent = subject;
+                    topicSelection.appendChild(subjectHeader);
+
+                    // 2. Topics Grid/List for the subject
+                    const topicGrid = document.createElement('div');
+                    topicGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
+                    
+                    topics.forEach(topic => {
+                        const topicCard = document.createElement('div');
+                        topicCard.className = 'option-card border-2 border-gray-200 rounded-xl p-4';
+                        // Store both topic and subject in data attributes
+                        topicCard.setAttribute('data-topic', topic);
+                        topicCard.setAttribute('data-subject', subject); 
+                        topicCard.innerHTML = `
+                            <div class="font-semibold text-gray-800 mb-1">${topic}</div>
+                            <div class="text-sm text-gray-500">From ${subject}</div>
+                        `;
+                        // Pass both topic and subject to the selection function
+                        topicCard.onclick = (event) => selectTopic(topic, subject, event.currentTarget);
+                        topicGrid.appendChild(topicCard);
+                    });
+                    
+                    topicSelection.appendChild(topicGrid);
+                }
+            });
+        }
+
+        // Select topic - now also sets the selectedSubject
+        function selectTopic(topic, subject, cardElement) {
+            selectedTopic = topic;
+            selectedSubject = subject; // Crucial: Store the subject from the data attribute
+            
+            // Update UI: Remove 'selected' from ALL topic cards (across all subjects)
+            document.querySelectorAll('#topicSelection .option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            cardElement.classList.add('selected');
+            
+            // Enable start button
+            document.getElementById('startButtonSection').style.display = 'block';
+            document.getElementById('startLearningButton').disabled = false;
+            
+            // Save to student data
+            studentData.topic = topic;
+            studentData.subject = subject;
+            localStorage.setItem('currentStudent', JSON.stringify(studentData));
+            
+            // Animate
+            anime({ targets: '#startButtonSection', translateY: [20, 0], opacity: [0, 1], duration: 500, easing: 'easeOutCubic' });
+        }
+
+        // Start quiz (rest of the functions remain mostly the same)
+        async function startQuiz() {
+            if (!selectedClass || !selectedSubject || !selectedTopic) {
+                alert('Please select class and topic before starting! (Subject is now determined automatically)');
+                return;
+            }
+            
+            // Show loading state in quiz section
+            document.getElementById('selectionSection').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'block';
+            document.getElementById('questionDisplay').innerHTML = '<div class="text-center text-gray-500 text-lg py-10">Loading questions from ' + selectedTopic + '...</div>';
+            
+            // Load questions
+            await loadQuestions();
+
+            // Check if questions were loaded successfully
+            if (questions.length === 0) {
+                document.getElementById('questionDisplay').innerHTML = '<div class="text-center text-red-600 text-lg py-10">Could not load questions for this topic.</div>';
+                document.getElementById('nextButton').style.display = 'none';
+                document.getElementById('submitButton').style.display = 'none';
+                return;
+            }
+            
+            // Reset quiz state and display first question
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById('scoreDisplay').textContent = '0';
+            document.getElementById('totalQuestions').textContent = questions.length;
+            displayQuestion();
+            
+            // Animate
+            anime({ targets: '#quizSection', translateY: [30, 0], opacity: [0, 1], duration: 800, easing: 'easeOutCubic' });
+        }
+
+        // Load questions (Simulates loading data from an external MD file)
+        async function loadQuestions() {
+            // Note: selectedSubject is crucial here for constructing the filename/path
+            questions = await fetchQuestionsFromTopic(selectedClass, selectedSubject, selectedTopic);
+        }
+
+        /**
+         * IMPORTANT: This function simulates fetching and parsing a Markdown file.
+         * In a real environment, replace the internal logic with an actual 'fetch'
+         * API call to your server endpoint where the MD files are hosted.
+         * * The structure of your Markdown file should be:
+         * * ---
+         * **Q. Question text?**
+         * * Option 1
+         * * **Option 2 (Correct)**
+         * * Option 3
+         * * Option 4
+         * * **Explanation:** Detailed explanation of the answer.
+         * ---
+         */
+        async function fetchQuestionsFromTopic(classNum, subject, topic) {
+            // 1. Construct the expected filename/endpoint (e.g., class6_mathematics_integers.md)
+            // Uses selectedSubject internally
+            const fileName = `class${classNum}_${subject.toLowerCase().replace(/\s+/g, '_')}_${topic.toLowerCase().replace(/\s+/g, '_')}.md`;
+            console.log(`Simulating fetch for: ${fileName}`);
+
+            // 2. SIMULATE FETCH DELAY (Remove in production)
+            await new Promise(resolve => setTimeout(resolve, 800)); 
+
+            // 3. SIMULATED MARKDOWN CONTENT
+            const simulatedMarkdown = `
+---
+**Q. What is the definition of an Integer?**
+* Any positive or negative number, excluding zero.
+* **A whole number (not a fractional number) that can be positive, negative, or zero.**
+* A number that contains a decimal point.
+* Only positive whole numbers.
+
+**Explanation:** The set of integers includes all whole numbers and their negative counterparts.
+---
+**Q. Which operation results in a positive number when multiplying two negative integers?**
+* Subtraction
+* Division
+* Addition
+* **Multiplication**
+
+**Explanation:** The product of two negative numbers is always a positive number (e.g., -2 * -3 = 6).
+---
+**Q. What is the additive inverse of -15?**
+* 0
+* -15
+* **15**
+* 1/-15
+
+**Explanation:** The additive inverse is the number that, when added to the original number, results in zero (-15 + 15 = 0).
+---
+**Q. Which property is shown by a + (b + c) = (a + b) + c?**
+* Commutative Property
+* Distributive Property
+* **Associative Property**
+* Closure Property
+
+**Explanation:** The associative property states that the grouping of numbers does not affect the result.
+---
+            `;
+
+            // 4. In a real app, you would replace the above line with:
+            // try {
+            //     const response = await fetch(\`./questions/${fileName}\`);
+            //     if (!response.ok) throw new Error('File not found');
+            //     const markdownText = await response.text();
+            //     return parseMarkdownQuestions(markdownText);
+            // } catch (error) {
+            //     console.error('Error loading markdown:', error);
+            //     return [];
+            // }
+
+            // 5. Use the simulated content for this demo
+            return parseMarkdownQuestions(simulatedMarkdown);
+        }
+
+        // Function to parse the Markdown structure into JS objects (unchanged)
+        function parseMarkdownQuestions(markdownText) {
+            const rawQuestions = markdownText.split('---').filter(block => block.trim().length > 0);
+            const parsedQuestions = [];
+
+            rawQuestions.forEach(block => {
+                const lines = block.trim().split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                
+                let questionText = '';
+                let options = [];
+                let correctIndex = -1;
+                let explanation = '';
+                let mode = 'question'; // 'question', 'options', 'explanation'
+
+                for (const line of lines) {
+                    if (line.startsWith('**Q.')) {
+                        questionText = line.replace('**Q.', '').trim();
+                        mode = 'options';
+                    } else if (line.startsWith('*')) {
+                        let option = line.replace('*', '').trim();
+                        if (option.startsWith('**') && option.endsWith('**')) {
+                            // Correct answer format: * **Option Text**
+                            option = option.replace(/\*\*/g, '').trim();
+                            correctIndex = options.length;
+                        }
+                        options.push(option);
+                    } else if (line.startsWith('**Explanation:**')) {
+                        explanation = line.replace('**Explanation:**', '').trim();
+                        mode = 'explanation';
+                    } else if (mode === 'explanation') {
+                        explanation += ' ' + line.trim();
+                    }
+                }
+                
+                if (questionText && options.length === 4 && correctIndex !== -1) {
+                    parsedQuestions.push({
+                        question: questionText,
+                        options: options,
+                        correct: correctIndex,
+                        explanation: explanation.trim(),
+                        userAnswer: null, // To store user's selection
+                        isCorrect: null // To store result
+                    });
+                } else {
+                    console.warn('Skipping malformed question block:', block);
+                }
+            });
+
+            return parsedQuestions;
+        }
+
+
+        // Display current question (unchanged logic)
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            const questionDisplay = document.getElementById('questionDisplay');
+            
+            questionDisplay.innerHTML = `
+                <div class="question-card border border-gray-200 rounded-xl p-6 mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">${question.question} (${selectedTopic})</h3>
+                    <div class="space-y-3" id="optionsContainer">
+                        ${question.options.map((option, index) => `
+                            <div class="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 cursor-pointer question-option" 
+                                 data-index="${index}"
+                                 onclick="selectAnswer(this, ${index})">
+                                <label class="flex items-center cursor-pointer pointer-events-none">
+                                    <input type="radio" name="answer" value="${index}" class="mr-3" ${question.userAnswer === index ? 'checked' : ''}>
+                                    <span>${option}</span>
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div id="feedbackBox" class="mt-4 p-3 rounded-lg border hidden">
+                        <div class="font-semibold" id="feedbackMessage"></div>
+                        <p class="text-sm mt-1 text-gray-700" id="explanationText">${question.explanation}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Check if an answer has been selected for this question already
+            if (question.userAnswer !== null) {
+                showFeedback(question.userAnswer, true); // Show feedback if already answered
+            }
+
+            // Update progress
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('quizProgress').style.width = `${progress}%`;
+            
+            // Update navigation buttons
+            document.getElementById('prevButton').style.display = currentQuestionIndex > 0 ? 'block' : 'none';
+            document.getElementById('nextButton').style.display = currentQuestionIndex < questions.length - 1 ? 'block' : 'block'; // Always show Next, will be disabled if no answer
+            document.getElementById('submitButton').style.display = currentQuestionIndex === questions.length - 1 ? 'block' : 'none';
+
+            // Manage Next/Submit button state
+            const nextButton = document.getElementById('nextButton');
+            const submitButton = document.getElementById('submitButton');
+            const isAnswered = questions[currentQuestionIndex].userAnswer !== null;
+
+            if (currentQuestionIndex < questions.length - 1) {
+                nextButton.disabled = !isAnswered;
+                submitButton.disabled = true;
+            } else {
+                nextButton.disabled = true; // Last question, no 'Next'
+                submitButton.disabled = !isAnswered;
+            }
+        }
+
+        // Select answer (unchanged logic)
+        function selectAnswer(cardElement, answerIndex) {
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            // If already answered, do nothing
+            if (currentQuestion.userAnswer !== null) return;
+
+            // Update UI: Remove 'selected' from all options
+            document.querySelectorAll('#optionsContainer .question-option').forEach(option => {
+                option.classList.remove('selected');
+                // Remove any feedback classes if present (shouldn't happen here but safe)
+                option.classList.remove('correct-answer', 'incorrect-answer');
+            });
+            
+            // Add 'selected' to the clicked option
+            cardElement.classList.add('selected');
+
+            // Store user's temporary selection (will be finalized on 'Next')
+            currentQuestion.userAnswer = answerIndex;
+
+            // Enable Next/Submit button
+            if (currentQuestionIndex < questions.length - 1) {
+                document.getElementById('nextButton').disabled = false;
+            } else {
+                document.getElementById('submitButton').disabled = false;
+            }
+        }
+
+        // Show Feedback (unchanged logic)
+        function showFeedback(userAnswer, isReadOnly) {
+            const question = questions[currentQuestionIndex];
+            const options = document.querySelectorAll('#optionsContainer .question-option');
+            const feedbackBox = document.getElementById('feedbackBox');
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            
+            const isCorrect = userAnswer === question.correct;
+            question.isCorrect = isCorrect; // Finalize result for scoring
+
+            if (isCorrect) {
+                options[userAnswer].classList.add('correct-answer');
+                feedbackBox.classList.add('bg-green-100', 'border-green-600');
+                feedbackMessage.textContent = 'Correct Answer! ✅';
+            } else {
+                options[userAnswer].classList.add('incorrect-answer');
+                options[question.correct].classList.add('correct-answer'); // Highlight correct one
+                feedbackBox.classList.add('bg-red-100', 'border-red-600');
+                feedbackMessage.textContent = 'Incorrect. The correct answer is highlighted. ❌';
+            }
+            
+            feedbackBox.classList.remove('hidden');
+
+            // Disable all options
+            if (isReadOnly) {
+                document.querySelectorAll('.question-option').forEach(option => {
+                    option.style.pointerEvents = 'none';
+                });
+            }
+        }
+
+        // Navigation functions (unchanged logic)
+        function nextQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            if (currentQuestion.userAnswer === null) {
+                alert('Please select an answer before moving to the next question.');
+                return;
+            }
+
+            // Finalize score for the current question
+            if (currentQuestion.isCorrect === null) {
+                 // First time moving past, show feedback and score
+                showFeedback(currentQuestion.userAnswer, true); 
+                score = questions.filter(q => q.isCorrect === true).length;
+                document.getElementById('scoreDisplay').textContent = score;
+            }
+
+
+            if (currentQuestionIndex < questions.length - 1) {
+                // Move to next question
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        // Submit quiz (unchanged logic)
+        function submitQuiz() {
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            if (currentQuestion.userAnswer === null) {
+                alert('Please select an answer for the last question before submitting.');
+                return;
+            }
+
+            // Finalize score for the last question if not done already
+            if (currentQuestion.isCorrect === null) {
+                 showFeedback(currentQuestion.userAnswer, true); 
+                score = questions.filter(q => q.isCorrect === true).length;
+                document.getElementById('scoreDisplay').textContent = score;
+            }
+
+
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            // Hide quiz section and show results
+            document.getElementById('quizSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('finalScore').textContent = `${percentage}%`;
+            
+            // Save progress
+            saveProgress(percentage);
+            
+            // Animate
+            anime({ targets: '#resultsSection', translateY: [30, 0], opacity: [0, 1], duration: 800, easing: 'easeOutCubic' });
+        }
+
+        // Save progress (unchanged logic)
+        function saveProgress(percentage) {
+            const progressKey = `progress_${selectedClass}_${selectedSubject}_${selectedTopic}`;
+            const progress = {
+                class: selectedClass,
+                subject: selectedSubject,
+                topic: selectedTopic,
+                score: percentage,
+                completedAt: new Date().toISOString(),
+                questionsAnswered: questions.length,
+                correctAnswers: score
+            };
+            
+            localStorage.setItem(progressKey, JSON.stringify(progress));
+            
+            // Update student data
+            if (!studentData.progress) studentData.progress = {};
+            studentData.progress[progressKey] = progress;
+            localStorage.setItem('currentStudent', JSON.stringify(studentData));
+        }
+
+        // Restart quiz (unchanged logic)
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            questions.forEach(q => {
+                q.userAnswer = null;
+                q.isCorrect = null;
+            });
+            document.getElementById('scoreDisplay').textContent = '0';
+            
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'block';
+            
+            displayQuestion();
+        }
+
+        // Back to selection (unchanged logic)
+        function backToSelection() {
+            currentQuestionIndex = 0;
+            score = 0;
+            questions = [];
+            
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'none';
+            document.getElementById('selectionSection').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
